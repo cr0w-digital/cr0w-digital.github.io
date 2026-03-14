@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⎇ phorq — file-based PHP router</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper:     #f2f4f6;
+    --ink:       #141820;
+    --ink-dim:   #6b7585;
+    --ink-faint: #a8b0bc;
+    --accent:    #2d6be4;
+    --code:      #e8ebef;
+    --rule:      #d0d5dd;
+  }
+
+  html { font-size: 18px; background: var(--paper); color: var(--ink); }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .ghost {
+    position: fixed;
+    top: -0.1em;
+    right: -0.05em;
+    font-family: 'EB Garamond', serif;
+    font-size: 52vw;
+    line-height: 1;
+    color: var(--ink);
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 0;
+    user-select: none;
+    animation: ghostIn 2s ease both;
+  }
+
+  @keyframes ghostIn {
+    from { opacity: 0; }
+    to   { opacity: 0.028; }
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Nav ── */
+  nav {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 2.5rem 0 2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .nav-symbol   { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--accent); }
+  .nav-wordmark { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--ink); letter-spacing: 0.02em; }
+  .nav-version  { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-faint); letter-spacing: 0.05em; }
+
+  .nav-links { display: flex; align-items: baseline; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ── Hero ── */
+  .hero { padding: 8rem 0 6rem; }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2.5rem;
+    display: block;
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(3.2rem, 7vw, 5.2rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    margin-bottom: 2rem;
+    max-width: 16ch;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .hero-body {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    color: var(--ink-dim);
+    max-width: 52ch;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .hero-body strong { color: var(--ink); font-weight: 500; }
+
+  .hero-install {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: var(--ink);
+    background: var(--code);
+    border: 1px solid var(--rule);
+    padding: 0.85rem 1.4rem;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    animation: fadeUp 0.6s ease 0.48s both;
+  }
+
+  .hero-install:hover { border-color: var(--accent); }
+  .hero-install .prompt { color: var(--accent); }
+
+  /* ── Sections ── */
+  section { border-top: 1px solid var(--rule); padding: 5rem 0; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 3rem;
+    display: block;
+  }
+
+  h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 em { font-style: italic; color: var(--accent); }
+
+  /* ── Convention ── */
+  .convention {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .convention-prose p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--ink-dim);
+    margin-bottom: 1.2rem;
+  }
+
+  .convention-prose p strong { color: var(--ink); font-weight: 500; }
+
+  .tree-wrap { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .tree-block {
+    background: var(--code);
+    border: 1px solid var(--rule);
+    padding: 1.75rem 2rem;
+  }
+
+  .tree-block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+
+  .tree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--ink-dim);
+  }
+
+  .tree .t-dir   { color: var(--ink); font-weight: 400; }
+  .tree .t-dyn   { color: var(--accent); }
+  .tree .t-catch { color: var(--accent); font-style: italic; }
+  .tree .t-mw    { color: var(--ink-faint); }
+  .tree .t-route { color: var(--ink); }
+  .tree .t-arrow { color: var(--ink-faint); }
+
+  /* ── Stats ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .stat {
+    padding: 2.5rem 0;
+    border-right: 1px solid var(--rule);
+    padding-left: 3.5rem;
+  }
+
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child  { border-right: none; }
+
+  .stat-val {
+    font-family: 'EB Garamond', serif;
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-val sup { font-size: 1.2rem; color: var(--accent); vertical-align: super; margin-left: 0.2rem; }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ── Code ── */
+  .code-nav {
+    display: flex;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .code-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    padding: 0.75rem 1.4rem;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
+    user-select: none;
+  }
+
+  .code-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .code-tab:hover:not(.active) { color: var(--ink-dim); }
+
+  .code-panel {
+    display: none;
+    background: var(--code);
+    border: 1px solid var(--rule);
+    border-top: none;
+    padding: 2.25rem 2.5rem;
+  }
+
+  .code-panel.active { display: block; }
+
+  .code-file {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 300;
+    line-height: 1.9;
+    color: var(--ink-dim);
+    overflow-x: auto;
+  }
+
+  .c-kw  { color: #1a56c4; }
+  .c-fn  { color: var(--ink); font-weight: 400; }
+  .c-str { color: #1a7a4a; }
+  .c-var { color: var(--ink); }
+  .c-dim { color: var(--ink-faint); }
+
+  /* ── Middleware ── */
+  .mw-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 2rem;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .mw-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--rule);
+  }
+
+  .mw-layer {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .mw-layer:last-child { border-bottom: none; }
+
+  .mw-layer-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--ink);
+    min-width: 7rem;
+  }
+
+  .mw-layer-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--ink-faint);
+  }
+
+  .mw-layer-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rule);
+    flex-shrink: 0;
+  }
+
+  .mw-layer.is-global  .mw-layer-dot { background: var(--accent); }
+  .mw-layer.is-handler .mw-layer-dot { background: var(--ink-faint); }
+
+  .mw-code { display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
+
+  .mw-layout > * { min-width: 0; }
+
+  .mw-snippet {
+    background: var(--code);
+    border: 1px solid var(--rule);
+    padding: 1.5rem 1.75rem;
+    overflow: hidden;
+  }
+
+  .mw-snippet pre {
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre;
+  }
+
+  .mw-snippet .code-file { margin-bottom: 0.9rem; }
+
+  /* ── Ecosystem ── */
+  .eco {
+    border-top: 1px solid var(--rule);
+    padding: 4rem 0 5rem;
+  }
+
+  .eco-row {
+    display: flex;
+    align-items: baseline;
+    gap: 3.5rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .eco-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.15s;
+  }
+
+  .eco-item:hover { opacity: 0.5; }
+  .eco-item.current { cursor: default; }
+
+  .eco-sym  { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent); }
+  .eco-name { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; color: var(--ink); }
+
+  .eco-item.current .eco-name::after {
+    content: ' ←';
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  footer p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+  }
+
+  .footer-links { display: flex; gap: 2rem; list-style: none; }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--ink-dim); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(0.8rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="ghost">⎇</div>
+
+<div class="page">
+
+  <nav>
+    <div class="nav-logo">
+      <span class="nav-symbol">⎇</span>
+      <span class="nav-wordmark">phorq</span>
+      <span class="nav-version">v0.1.0</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">GitHub ↗</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <span class="hero-label">File-based PHP router</span>
+    <h1>Your filesystem<br>is the <em>router.</em></h1>
+    <p class="hero-body">
+      Drop a file in <strong>modules/core/routes/</strong> and it is a route.
+      No registration. No config. No controllers.
+      Dynamic segments, catch-alls, middleware — all expressed as directory structure.
+    </p>
+    <div class="hero-install">
+      <span class="prompt">$</span>
+      <span>composer require cr0w/phorq</span>
+    </div>
+  </div>
+
+  <!-- Convention -->
+  <section>
+    <span class="section-label">Convention</span>
+    <div class="convention">
+      <div class="convention-prose">
+        <h2>Structure<br>as <em>declaration.</em></h2>
+        <p>
+          The directory tree is the route map. phorq scans your modules folder
+          once at boot and caches the result as a plain PHP array. On subsequent
+          requests it is a single <strong>require</strong>.
+        </p>
+        <p>
+          Dynamic segments are folder or file names: <strong>[id]</strong> captures
+          a segment, <strong>[...rest]</strong> catches everything beyond,
+          <strong>[[...opt]]</strong> makes it optional. Ambiguity is detected
+          at scan time, not at runtime.
+        </p>
+        <p>
+          Modules mount at named paths. The <strong>core</strong> module is the
+          fallback. Each module carries its own middleware and routes without
+          touching the others.
+        </p>
+      </div>
+      <div class="tree-wrap">
+        <div class="tree-block">
+          <span class="tree-block-label">modules/</span>
+          <div class="tree">
+            <div><span class="t-dir">core/</span></div>
+            <div>&nbsp;&nbsp;<span class="t-mw">middleware.php</span></div>
+            <div>&nbsp;&nbsp;<span class="t-dir">routes/</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-route">index.php</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-dir">users/</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-route">index.php</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-dyn">[id].php</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-dir">docs/</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-catch">[...rest].php</span></div>
+            <div style="margin-top:0.75rem"><span class="t-dir">blog/</span></div>
+            <div>&nbsp;&nbsp;<span class="t-mw">config.php</span>&nbsp;&nbsp;<span class="t-arrow">← mount: blog</span></div>
+            <div>&nbsp;&nbsp;<span class="t-dir">routes/</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-route">index.php</span></div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-dyn">[slug].php</span></div>
+          </div>
+        </div>
+        <div class="tree-block">
+          <span class="tree-block-label">resolves to</span>
+          <div class="tree">
+            <div><span class="t-arrow">/</span></div>
+            <div><span class="t-arrow">/users</span></div>
+            <div><span class="t-arrow">/users/</span><span class="t-dyn">:id</span></div>
+            <div><span class="t-arrow">/docs/</span><span class="t-catch">*</span></div>
+            <div><span class="t-arrow">/blog</span></div>
+            <div><span class="t-arrow">/blog/</span><span class="t-dyn">:slug</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val">1<sup>file</sup></div>
+      <div class="stat-label">To add a route</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">0<sup>ms</sup></div>
+      <div class="stat-label">Lookup — cached</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">0<sup>dep</sup></div>
+      <div class="stat-label">Runtime dependencies</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">~600<sup>loc</sup></div>
+      <div class="stat-label">Entire router</div>
+    </div>
+  </div>
+
+  <!-- Usage -->
+  <section>
+    <span class="section-label">Usage</span>
+    <div class="code-nav">
+      <div class="code-tab active" onclick="showTab('route', event)">Route file</div>
+      <div class="code-tab" onclick="showTab('bootstrap', event)">Bootstrap</div>
+    </div>
+
+    <div id="tab-route" class="code-panel active">
+      <span class="code-file">modules/core/routes/users/[id].php</span>
+<pre><span class="c-dim">// $id, $req, $ctx available in scope</span>
+
+<span class="c-var">$user</span> = user\sql::<span class="c-fn">find</span>(<span class="c-var">$id</span>) ?: <span class="c-fn">notFound</span>();
+
+<span class="c-kw">if</span> (<span class="c-var">$req</span>-><span class="c-fn">isPost</span>()) {
+    user\cmd::<span class="c-fn">update</span>(<span class="c-var">$id</span>, <span class="c-var">$req</span>->input);
+    <span class="c-kw">return</span> <span class="c-fn">redirect</span>(<span class="c-str">"/users/{$id}"</span>);
+}
+
+<span class="c-kw">return</span> <span class="c-fn">h</span>(<span class="c-str">'.card'</span>,
+    <span class="c-fn">h</span>(<span class="c-str">'.eyebrow'</span>, <span class="c-var">$user</span>[<span class="c-str">'name'</span>]),
+    <span class="c-fn">h</span>(<span class="c-str">'.user-form'</span>, userForm(<span class="c-var">$user</span>)),
+);</pre>
+    </div>
+
+    <div id="tab-bootstrap" class="code-panel">
+      <span class="code-file">public/index.php</span>
+<pre><span class="c-kw">use</span> phorq\<span class="c-fn">Router</span>;
+
+<span class="c-var">$router</span> = <span class="c-fn">Router</span>::<span class="c-fn">create</span>(__DIR__ . <span class="c-str">'/../modules'</span>);
+<span class="c-var">$result</span> = <span class="c-var">$router</span>-><span class="c-fn">route</span>(<span class="c-var">$ctx</span>);
+
+<span class="c-kw">if</span> (!<span class="c-var">$result</span>) {
+    <span class="c-fn">http_response_code</span>(<span class="c-str">404</span>);
+    <span class="c-kw">echo</span> <span class="c-str">'404 Not Found'</span>;
+    <span class="c-kw">return</span>;
+}
+
+<span class="c-kw">echo</span> <span class="c-var">$result</span>->value;</pre>
+    </div>
+  </section>
+
+  <!-- Middleware -->
+  <section>
+    <span class="section-label">Middleware</span>
+    <h2>One callable.<br><em>Three places.</em></h2>
+    <div class="mw-layout">
+      <div>
+        <div class="mw-stack">
+          <div class="mw-layer is-global">
+            <div class="mw-layer-dot"></div>
+            <div class="mw-layer-name">global</div>
+            <div class="mw-layer-desc">router->use() — wraps everything</div>
+          </div>
+          <div class="mw-layer">
+            <div class="mw-layer-dot"></div>
+            <div class="mw-layer-name">core</div>
+            <div class="mw-layer-desc">core/middleware.php — every request</div>
+          </div>
+          <div class="mw-layer">
+            <div class="mw-layer-dot"></div>
+            <div class="mw-layer-name">module</div>
+            <div class="mw-layer-desc">account/middleware.php — module only</div>
+          </div>
+          <div class="mw-layer is-handler">
+            <div class="mw-layer-dot"></div>
+            <div class="mw-layer-name">handler</div>
+            <div class="mw-layer-desc">the route file</div>
+          </div>
+        </div>
+      </div>
+      <div class="mw-code">
+        <div class="mw-snippet">
+          <span class="code-file">public/index.php — global</span>
+<pre><span class="c-var">$router</span>
+    -><span class="c-fn">use</span>(<span class="c-kw">new</span> <span class="c-fn">SessionMiddleware</span>())
+    -><span class="c-fn">use</span>(<span class="c-kw">new</span> <span class="c-fn">CspMiddleware</span>([<span class="c-str">'default-src'</span> => <span class="c-str">"'self'"</span>]));</pre>
+        </div>
+        <div class="mw-snippet">
+          <span class="code-file">modules/account/middleware.php — module</span>
+<pre><span class="c-kw">return</span> <span class="c-kw">function</span> (<span class="c-fn">callable</span> <span class="c-var">$next</span>, <span class="c-fn">Request</span> <span class="c-var">$req</span>, <span class="c-fn">AppContext</span> <span class="c-var">$ctx</span>): <span class="c-fn">mixed</span> {
+    <span class="c-kw">if</span> (!<span class="c-var">$ctx</span>->auth) {
+        <span class="c-kw">return</span> <span class="c-var">$req</span>-><span class="c-fn">isHtmx</span>()
+            ? <span class="c-fn">htmxRedirect</span>(<span class="c-str">'/login'</span>)
+            : <span class="c-fn">redirect</span>(<span class="c-str">'/login'</span>);
+    }
+    <span class="c-kw">return</span> <span class="c-var">$next</span>();
+};</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ecosystem -->
+  <div class="eco">
+    <span class="section-label">Ecosystem</span>
+    <div class="eco-row">
+      <a href="#" class="eco-item current">
+        <span class="eco-sym">⎇</span>
+        <span class="eco-name">phorq</span>
+      </a>
+      <a href="#" class="eco-item">
+        <span class="eco-sym">φ</span>
+        <span class="eco-name">phi</span>
+      </a>
+      <a href="#" class="eco-item">
+        <span class="eco-sym">⏛</span>
+        <span class="eco-name">phuse</span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p>⎇ phorq — cr0w digital — MIT</p>
+    <ul class="footer-links">
+      <li><a href="#">GitHub</a></li>
+      <li><a href="#">Packagist</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+  function showTab(name, e) {
+    document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
