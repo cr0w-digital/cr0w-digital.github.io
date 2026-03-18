@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cr0w.digital/schema/mcp.json",
+  "title": "mcp.json",
+  "description": "Declares an MCP server for a package.",
+  "type": "object",
+  "required": ["id", "server", "runtime"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id":      { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$" },
+    "server":  { "type": "string" },
+    "runtime": { "type": "string" },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "name":        { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}
