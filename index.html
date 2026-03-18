@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>cr0w.digital</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Hairline&family=Geist:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+    <style>
+      /* ─── Reset ─────────────────────────────────────────────────── */
+      html { box-sizing: border-box; }
+      *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+ 
+      /* ─── Tokens ────────────────────────────────────────────────── */
+      :root {
+        --void:      #080808;
+        --surface:   #111110;
+        --raised:    #1a1916;
+        --amber:     #c8893a;
+        --ember:     #e85030;
+        --parchment: #d8d4c4;
+        --muted:     #8a7a5a;
+        --faint:     #3a3530;
+ 
+        --font-sans:    'Geist', 'Inter', sans-serif;
+        --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+        --font-display: 'Bungee Hairline', sans-serif;
+      }
+ 
+      /* ─── Page backgrounds ──────────────────────────────────────── */
+      body {
+        min-height: 100vh;
+        background-color: var(--void);
+        background-image: url("img/bgrange-dark.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        color: #d1cdc0;
+        font-family: var(--font-sans);
+      }
+
+      /* ─── App shell ─────────────────────────────────────────────── */
+      .app {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background-image: url("img/crow-dark.webp");
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: left 50px;
+      }
+ 
+      /* ─── Header ────────────────────────────────────────────────── */
+      header {
+        display: flex;
+        align-items: center;
+        padding: 2rem 2rem 0;
+      }
+ 
+      /* ─── Main ──────────────────────────────────────────────────── */
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+ 
+      /* ─── Right panel ───────────────────────────────────────────── */
+      .panel {
+        margin-left: auto;
+        width: 480px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+ 
+      @media (min-width: 1024px) {
+        .panel { width: 48%; }
+      }
+ 
+      /* ─── Section ───────────────────────────────────────────────── */
+      section {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 4rem 3rem;
+      }
+ 
+      @media (min-width: 768px) {
+        section { padding: 4rem; }
+      }
+ 
+      /* ─── Eyebrow ───────────────────────────────────────────────── */
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 1.5rem;
+        user-select: none;
+      }
+
+      /* ─── Headline ──────────────────────────────────────────────── */
+      h1 {
+        line-height: 1;
+        margin-bottom: 1.5rem;
+      }
+ 
+      .h-light {
+        display: block;
+        font-family: var(--font-sans);
+        font-size: clamp(1.75rem, 3vw, 2.25rem);
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        color: var(--parchment);
+      }
+ 
+      .h-accent {
+        display: block;
+        font-size: clamp(3.5rem, 7vw, 5rem);
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        -webkit-text-stroke: 1.5px var(--amber);
+        color: transparent;
+        line-height: 1;
+      }
+ 
+      /* ─── Subheading ────────────────────────────────────────────── */
+      .subhead {
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        max-width: 20rem;
+      }
+ 
+      /* ─── Button ────────────────────────────────────────────────── */
+      .btn-ghost {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--parchment);
+        border: 0.5px solid var(--faint);
+        padding: 0.75rem 1.25rem;
+        border-radius: 2px;
+      }
+ 
+      .btn-ghost:hover, .btn-ghost:focus {
+        background: #c8893a12;
+        border-color: #ffb347;
+        outline: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+
+      <header>
+        <img src="img/cdlogo-dark.png"  alt="cr0w digital" width="100" />
+      </header>
+
+      <main>
+        <div class="panel">
+          <section>
+
+            <p class="eyebrow">UNCAGE. INNOVATE.</p>
+
+            <h1>
+              <span class="h-light">We build</span>
+              <span class="h-accent">digital</span>
+              <span class="h-light">infrastructure.</span>
+            </h1>
+
+            <p class="subhead">
+              Open source tools<br />for the commons.
+            </p>
+
+            <a href="https://github.com/cr0w-digital" class="btn-ghost" id="cta">View Packages →</a>
+
+          </section>
+        </div>
+      </main>
+
+    </div>
+  </body>
+</html>
