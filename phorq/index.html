@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⎇ phorq — file-based PHP router</title>
+<title>⎇ phorq | file-based PHP router</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -18,6 +18,8 @@
     --accent:    #2d6be4;
     --code:      #e8ebef;
     --rule:      #d0d5dd;
+    --dim:       #7a8a9a;
+    --border:    #d0d5dd;
   }
 
   html { font-size: 18px; background: var(--paper); color: var(--ink); }
@@ -382,39 +384,59 @@
   .mw-snippet .code-file { margin-bottom: 0.9rem; }
 
   /* ── Ecosystem ── */
-  .eco {
-    border-top: 1px solid var(--rule);
-    padding: 4rem 0 5rem;
+  .ecosystem {
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    border-bottom: 1px solid var(--border);
   }
 
-  .eco-row {
+  .eco-links {
     display: flex;
-    align-items: baseline;
-    gap: 3.5rem;
-    margin-top: 2.5rem;
+    gap: 2rem;
     flex-wrap: wrap;
+    margin-top: 0.5rem;
+    align-items: flex-end;
   }
 
-  .eco-item {
+  .eco-link {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    color: inherit;
-    transition: opacity 0.15s;
+    color: var(--dim);
+    transition: color 0.15s;
   }
 
-  .eco-item:hover { opacity: 0.5; }
-  .eco-item.current { cursor: default; }
+  .eco-link:hover { color: var(--ink); }
 
-  .eco-sym  { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent); }
-  .eco-name { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; color: var(--ink); }
-
-  .eco-item.current .eco-name::after {
-    content: ' ←';
-    color: var(--ink-faint);
-    font-weight: 300;
+  .eco-link .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--dim);
+    letter-spacing: 0.02em;
   }
+
+  .eco-link.phi-sym .sym {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+  }
+
+  .eco-link.phrazor-sym .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 1.1rem;
+  }
+
+  .eco-link .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+
+  .eco-link.current .sym { color: var(--accent); }
+  .eco-link.current      { color: var(--ink); }
 
   /* ── Footer ── */
   footer {
@@ -443,6 +465,10 @@
   }
   .footer-links a:hover { color: var(--ink-dim); }
 
+  .section-usage {
+    animation: fadeUp 0.6s ease 0.55s both;
+  }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(0.8rem); }
     to   { opacity: 1; transform: translateY(0); }
@@ -462,7 +488,7 @@
       <span class="nav-version">v0.1.0</span>
     </div>
     <ul class="nav-links">
-      <li><a href="#">GitHub ↗</a></li>
+      <li><a href="https://github.com/cr0w-digital/phorq">GitHub ↗</a></li>
     </ul>
   </nav>
 
@@ -559,7 +585,7 @@
   </div>
 
   <!-- Usage -->
-  <section>
+  <section class="section-usage">
     <span class="section-label">Usage</span>
     <div class="code-nav">
       <div class="code-tab active" onclick="showTab('route', event)">Route file</div>
@@ -570,7 +596,7 @@
       <span class="code-file">modules/core/routes/users/[id].php</span>
 <pre><span class="c-dim">// $id, $req, $ctx available in scope</span>
 
-<span class="c-var">$user</span> = user\sql::<span class="c-fn">find</span>(<span class="c-var">$id</span>) ?: <span class="c-fn">notFound</span>();
+<span class="c-var">$user</span> = user\query::<span class="c-fn">find</span>(<span class="c-var">$id</span>) ?: <span class="c-fn">notFound</span>();
 
 <span class="c-kw">if</span> (<span class="c-var">$req</span>-><span class="c-fn">isPost</span>()) {
     user\cmd::<span class="c-fn">update</span>(<span class="c-var">$id</span>, <span class="c-var">$req</span>->input);
@@ -652,29 +678,28 @@
   </section>
 
   <!-- Ecosystem -->
-  <div class="eco">
+  <div class="ecosystem">
     <span class="section-label">Ecosystem</span>
-    <div class="eco-row">
-      <a href="#" class="eco-item current">
-        <span class="eco-sym">⎇</span>
-        <span class="eco-name">phorq</span>
+    <div class="eco-links">
+      <a href="../phml/index.html" class="eco-link">
+        <span class="sym">&lt;/</span>
+        <span class="name">phml</span>
       </a>
-      <a href="#" class="eco-item">
-        <span class="eco-sym">φ</span>
-        <span class="eco-name">phi</span>
+      <a href="#" class="eco-link current">
+        <span class="sym">⎇</span>
+        <span class="name">phorq</span>
       </a>
-      <a href="#" class="eco-item">
-        <span class="eco-sym">⏛</span>
-        <span class="eco-name">phuse</span>
+      <a href="../phrazor/index.html" class="eco-link phrazor-sym">
+        <span class="sym">//</span>
+        <span class="name">phrazor</span>
       </a>
     </div>
   </div>
 
   <footer>
-    <p>⎇ phorq — cr0w digital — MIT</p>
+    <p>⎇ phorq — MIT</p>
     <ul class="footer-links">
-      <li><a href="#">GitHub</a></li>
-      <li><a href="#">Packagist</a></li>
+      <li><a href="https://github.com/cr0w-digital/phorq">GitHub</a></li>
     </ul>
   </footer>
 

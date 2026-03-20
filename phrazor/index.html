@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>// phrazor | i18n for PHP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper:  #f2ede4;
+    --ink:    #1a1510;
+    --accent: #8b3a2a;
+    --code:   #ebe5db;
+    --mid:    #5a4a3a;
+    --dim:    #9a8a7a;
+    --border: #d8cfc4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+  }
+
+  /* ── Ghost ───────────────────────────────────────────────────── */
+
+  .ghost {
+    position: fixed;
+    top: 50%;
+    right: -0.05em;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(400px, 58vw, 800px);
+    line-height: 1;
+    color: var(--accent);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    animation: ghostIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  @keyframes ghostIn {
+    from { opacity: 0; }
+    to   { opacity: 0.06; }
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  /* ── Nav ─────────────────────────────────────────────────────── */
+
+  nav {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65em;
+  }
+
+  .nav-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--accent);
+    position: relative;
+    top: 0.06em;
+  }
+
+  .nav-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .nav-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+  }
+
+  .nav-right a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  .nav-right a:hover { color: var(--ink); }
+
+  /* ── Sections ────────────────────────────────────────────────── */
+
+  section {
+    padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.8rem;
+  }
+
+  h1, h2 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 7.5vw, 5rem);
+    margin-bottom: 1.8rem;
+    max-width: 720px;
+  }
+
+  h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin-bottom: 1.4rem;
+    max-width: 640px;
+  }
+
+  h1 em, h2 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--mid);
+    max-width: 600px;
+    margin-bottom: 1rem;
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── Install ─────────────────────────────────────────────────── */
+
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.9rem 1.4rem;
+    margin-top: 2rem;
+  }
+
+  .install .prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .install .cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--ink);
+  }
+
+  /* ── Stats ───────────────────────────────────────────────────── */
+
+  .stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-top: 2.8rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.35rem;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ── Code ────────────────────────────────────────────────────── */
+
+  pre {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1.4rem 1.6rem;
+    overflow-x: auto;
+    margin: 1.6rem 0;
+  }
+
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    line-height: 1.8;
+    color: var(--ink);
+    display: block;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.1em 0.35em;
+    color: var(--ink);
+  }
+
+  pre code { background: none; border: none; padding: 0; font-size: 0.76rem; }
+
+  .tok-comment { color: var(--dim); font-style: italic; }
+  .tok-str     { color: var(--accent); }
+  .tok-kw      { color: var(--ink); font-weight: 500; }
+  .tok-fn      { color: var(--mid); }
+  .tok-dim     { color: var(--dim); }
+
+  /* ── Two col ─────────────────────────────────────────────────── */
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 1.6rem;
+  }
+
+  @media (max-width: 660px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  .col-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 0.6rem;
+  }
+
+  /* ── Locale chain ────────────────────────────────────────────── */
+
+  .chain {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    margin: 1.6rem 0 0.4rem;
+  }
+
+  .chain-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-right: none;
+    padding: 0.5rem 1rem;
+    color: var(--mid);
+    white-space: nowrap;
+  }
+
+  .chain-step:last-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .chain-step.fallback {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+
+  /* ── Config table ────────────────────────────────────────────── */
+
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.6rem;
+  }
+
+  .config-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: left;
+    padding: 0 1.2rem 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .config-table td {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+
+  .config-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .config-table td:last-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+  }
+
+  .config-table tr:last-child td { border-bottom: none; }
+
+  /* ── Scanner placements ──────────────────────────────────────── */
+
+  .placements {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.6rem 0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .placement {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .placement:last-child { border-bottom: none; }
+
+  .placement-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    background: var(--code);
+    padding: 0.7rem 1rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .placement-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--mid);
+    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── Hero animations ─────────────────────────────────────────── */
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(0.8rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-section .section-label {
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  .hero-section h1 {
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .hero-section p {
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .hero-section .install {
+    animation: fadeUp 0.6s ease 0.48s both;
+  }
+
+  .section-usage {
+    animation: fadeUp 0.6s ease 0.55s both;
+  }
+
+  /* ── Ecosystem footer ────────────────────────────────────────── */
+
+  .ecosystem {
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eco-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .eco-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--dim);
+    transition: color 0.15s;
+  }
+
+  .eco-link:hover { color: var(--ink); }
+
+  .eco-link .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+
+  .eco-link.phi-sym .sym {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+  }
+
+  .eco-link.phrazor-sym .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 1.1rem;
+  }
+
+  .eco-link .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+
+  .eco-link.current .sym { color: var(--accent); }
+  .eco-link.current      { color: var(--ink); }
+
+  /* ── Site footer ─────────────────────────────────────────────── */
+
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.6rem 0 2.4rem;
+  }
+
+  .site-footer-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--dim);
+  }
+
+  .site-footer-right {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .site-footer-right a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  .site-footer-right a:hover { color: var(--ink); }
+
+  /* ── Responsive ──────────────────────────────────────────────── */
+
+  @media (max-width: 480px) {
+    .page  { padding: 0 1.4rem; }
+    .stats { gap: 1.6rem; }
+    .chain { gap: 0; }
+    .chain-step { border-right: 1px solid var(--border); border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ghost" aria-hidden="true">//</div>
+
+<div class="page">
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-left">
+      <span class="nav-symbol" aria-hidden="true">//</span>
+      <span class="nav-name">phrazor</span>
+      <span class="nav-version">v0.1.0</span>
+    </div>
+    <div class="nav-right">
+      <a href="https://github.com/cr0w-digital/phrazor">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="section-label">Gettext-style i18n with ICU formatting for PHP</div>
+
+    <h1>Gettext keys.<br><em>ICU power.</em></h1>
+
+    <p>
+      Source strings as keys, like gettext. ICU formatting for plurals
+      and gender, like Symfony's translator. Plain PHP arrays — no
+      <code>.po</code>, no parsing.
+    </p>
+
+    <div class="install">
+      <span class="prompt">$</span>
+      <span class="cmd">composer require cr0w/phrazor</span>
+    </div>
+  </section>
+
+  <!-- Usage -->
+  <section class="section-usage">
+    <div class="section-label">Usage</div>
+    <h2>Source patterns<br>as <em>keys.</em></h2>
+
+    <p>
+      The global <code>t()</code> alias is registered at autoload time.
+      If <code>t()</code> is already defined, a notice is issued and you
+      use <code>\phrazor\t()</code> directly. Both signatures are identical.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="col-label">Simple &amp; substitution</div>
+<pre><code><span class="tok-comment">// No vars — returns translation or pattern</span>
+<span class="tok-fn">t</span>(<span class="tok-str">'Welcome'</span>);
+
+<span class="tok-comment">// Variable substitution — ICU syntax</span>
+<span class="tok-fn">t</span>(<span class="tok-str">'Welcome, {name}'</span>, [
+    <span class="tok-str">'name'</span> => $name,
+]);
+
+<span class="tok-comment">// Namespaced form — always available</span>
+\phrazor\<span class="tok-fn">t</span>(<span class="tok-str">'Welcome, {name}'</span>, [
+    <span class="tok-str">'name'</span> => $name,
+]);</code></pre>
+      </div>
+      <div>
+        <div class="col-label">Pluralization &amp; gender</div>
+<pre><code><span class="tok-comment">// Plural</span>
+<span class="tok-fn">t</span>(<span class="tok-str">'{count, plural,
+    =0 {No items}
+    one {# item}
+    other {# items}
+}'</span>, [<span class="tok-str">'count'</span> => $n]);
+
+<span class="tok-comment">// Gender / select</span>
+<span class="tok-fn">t</span>(<span class="tok-str">'{gender, select,
+    male {He liked this}
+    female {She liked this}
+    other {They liked this}
+}'</span>, [<span class="tok-str">'gender'</span> => $g]);</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Locale files -->
+  <section>
+    <div class="section-label">Locale files</div>
+    <h2>Plain PHP arrays.<br><em>Nothing</em> to learn.</h2>
+
+    <p>
+      Each locale file returns a PHP array. The source pattern is the key,
+      the translation is the value. ICU patterns — including multiline
+      pluralization and gender blocks — are valid as both keys and values.
+      If a pattern has no translation, the pattern itself is returned.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="col-label">i18n/fr_FR.php</div>
+<pre><code><span class="tok-kw">return</span> [
+
+    <span class="tok-str">'Welcome'</span> => <span class="tok-str">'Bienvenue'</span>,
+
+    <span class="tok-str">'Welcome, {name}'</span> =>
+    <span class="tok-str">'Bienvenue, {name}'</span>,
+
+    <span class="tok-str">'{count, plural,
+        =0 {No items}
+        one {# item}
+        other {# items}
+    }'</span> =>
+    <span class="tok-str">'{count, plural,
+        =0 {Aucun élément}
+        one {# élément}
+        other {# éléments}
+    }'</span>,
+
+];</code></pre>
+      </div>
+      <div>
+        <p>
+          <strong>en_US requires no locale file.</strong> If a pattern
+          has no entry, the pattern itself is the translation. Your
+          source code is already the English copy.
+        </p>
+        <p>
+          Multiline patterns are supported as keys — phrazor does not
+          normalize or reformat them. Write the pattern however you
+          write it in source and use it as-is in the locale file.
+        </p>
+        <p>
+          Locale files are plain <code>require</code>d PHP — no parsing,
+          no deserialization. The result is cached in memory for the
+          lifetime of the process.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Configuration -->
+  <section>
+    <div class="section-label">Configuration</div>
+    <h2>Three constants.<br>Set them in <em>bootstrap.</em></h2>
+
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>Constant</th>
+          <th>Purpose</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>PHRAZOR_I18N_PATH</td>
+          <td>Directory containing locale files.</td>
+          <td>i18n/</td>
+        </tr>
+        <tr>
+          <td>PHRAZOR_LOCALE</td>
+          <td>Active locale identifier.</td>
+          <td>en_US</td>
+        </tr>
+        <tr>
+          <td>PHRAZOR_MISSING_LOCALE</td>
+          <td>Behaviour when a locale file is not found: <code>error</code>, <code>warn</code>, or <code>silent</code>.</td>
+          <td>warn / silent</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:1.4rem;">Locale resolution order:</p>
+
+    <div class="chain">
+      <div class="chain-step">argument</div>
+      <div class="chain-step">PHRAZOR_LOCALE</div>
+      <div class="chain-step">APP_LOCALE</div>
+      <div class="chain-step fallback">en_US</div>
+    </div>
+
+    <p style="margin-top:1rem;">
+      When <code>PHRAZOR_MISSING_LOCALE</code> is not set, phrazor warns
+      when <code>APP_DEBUG</code> is truthy and falls back silently in production.
+    </p>
+  </section>
+
+  <!-- Scanner -->
+  <section>
+    <div class="section-label">Scanner</div>
+    <h2>Keep locale files<br>in <em>sync.</em></h2>
+
+    <p>
+      The scanner crawls your source files, extracts every pattern passed
+      to <code>t()</code>, and diffs against your existing locale files —
+      adding new keys, flagging removed ones, leaving existing translations
+      untouched.
+    </p>
+
+    <div class="two-col" style="margin-top:2rem;">
+      <div>
+        <div class="col-label">CLI</div>
+<pre><code><span class="tok-comment"># Scan using phrazor.php in project root</span>
+vendor/bin/phrazor scan
+
+<span class="tok-comment"># Specify locales</span>
+vendor/bin/phrazor scan \
+    --locale=fr_FR,de_DE \
+    --output=verbose
+
+<span class="tok-comment"># Custom function aliases</span>
+vendor/bin/phrazor scan \
+    --functions=t,_,trans
+
+<span class="tok-comment"># Identity mappings for new keys</span>
+vendor/bin/phrazor scan --identity</code></pre>
+      </div>
+      <div>
+        <div class="col-label">phrazor.php</div>
+<pre><code><span class="tok-kw">return</span> [
+    <span class="tok-str">'i18n_path'</span> => __DIR__ . <span class="tok-str">'/i18n'</span>,
+    <span class="tok-str">'source'</span>    => [__DIR__ . <span class="tok-str">'/src'</span>],
+    <span class="tok-str">'locales'</span>   => [<span class="tok-str">'fr_FR'</span>, <span class="tok-str">'de_DE'</span>],
+    <span class="tok-str">'functions'</span> => [<span class="tok-str">'t'</span>, <span class="tok-str">'_'</span>],
+
+    <span class="tok-str">'scan'</span> => [
+        <span class="tok-str">'removed'</span>  => <span class="tok-str">'comment'</span>,
+        <span class="tok-str">'new_keys'</span> => <span class="tok-str">'bottom'</span>,
+        <span class="tok-str">'sort'</span>     => <span class="tok-kw">false</span>,
+        <span class="tok-str">'identity'</span> => <span class="tok-kw">false</span>,
+        <span class="tok-str">'output'</span>   => <span class="tok-str">'summary'</span>,
+    ],
+];</code></pre>
+      </div>
+    </div>
+
+    <p style="margin-top:1.6rem;">New key placement options:</p>
+
+    <div class="placements">
+      <div class="placement">
+        <div class="placement-key">bottom</div>
+        <div class="placement-val">Appended after existing keys — default</div>
+      </div>
+      <div class="placement">
+        <div class="placement-key">top</div>
+        <div class="placement-val">Prepended before existing keys</div>
+      </div>
+      <div class="placement">
+        <div class="placement-key">sort</div>
+        <div class="placement-val">Entire file sorted alphabetically after update</div>
+      </div>
+    </div>
+
+    <p style="margin-top:1.4rem;">
+      Uses <code>token_get_all()</code> — not regex. Multiline patterns,
+      heredocs, and nowdocs are extracted correctly. Dynamic patterns
+      such as <code>t($var)</code> or <code>t('a' . $b)</code> are skipped
+      with a warning showing file and line number.
+    </p>
+
+    <p>
+      New keys are written as <code>// TODO:</code> comments so translators
+      know what needs attention. Removed keys are commented out rather
+      than deleted, preserving translations if a key returns.
+    </p>
+  </section>
+
+  <!-- Ecosystem -->
+  <section class="ecosystem">
+    <div class="section-label">Ecosystem</div>
+    <div class="eco-links">
+      <a href="../phml/index.html" class="eco-link">
+        <span class="sym">&lt;/</span>
+        <span class="name">phml</span>
+      </a>
+      <a href="../phorq/index.html" class="eco-link">
+        <span class="sym">⎇</span>
+        <span class="name">phorq</span>
+      </a>
+      <a href="#" class="eco-link current phrazor-sym">
+        <span class="sym">//</span>
+        <span class="name">phrazor</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Site footer -->
+  <div class="site-footer">
+    <div class="site-footer-left">// phrazor — MIT</div>
+    <div class="site-footer-right">
+      <a href="https://github.com/cr0w-digital/phrazor">GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

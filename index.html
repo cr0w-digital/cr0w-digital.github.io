@@ -8,13 +8,13 @@
     <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bungee+Hairline&family=Geist:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Hairline&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Geist:wght@100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
     <style>
       /* ─── Reset ─────────────────────────────────────────────────── */
       html { box-sizing: border-box; }
       *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
- 
+
       /* ─── Tokens ────────────────────────────────────────────────── */
       :root {
         --void:      #080808;
@@ -25,12 +25,12 @@
         --parchment: #d8d4c4;
         --muted:     #8a7a5a;
         --faint:     #3a3530;
- 
+
         --font-sans:    'Geist', 'Inter', sans-serif;
         --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
         --font-display: 'Bungee Hairline', sans-serif;
       }
- 
+
       /* ─── Page backgrounds ──────────────────────────────────────── */
       body {
         min-height: 100vh;
@@ -54,21 +54,21 @@
         background-size: contain;
         background-position: left 50px;
       }
- 
+
       /* ─── Header ────────────────────────────────────────────────── */
       header {
         display: flex;
         align-items: center;
         padding: 2rem 2rem 0;
       }
- 
+
       /* ─── Main ──────────────────────────────────────────────────── */
       main {
         flex: 1;
         display: flex;
         align-items: center;
       }
- 
+
       /* ─── Right panel ───────────────────────────────────────────── */
       .panel {
         margin-left: auto;
@@ -77,11 +77,11 @@
         display: flex;
         align-items: center;
       }
- 
+
       @media (min-width: 1024px) {
         .panel { width: 48%; }
       }
- 
+
       /* ─── Section ───────────────────────────────────────────────── */
       section {
         display: flex;
@@ -90,11 +90,11 @@
         align-items: flex-start;
         padding: 4rem 3rem;
       }
- 
+
       @media (min-width: 768px) {
         section { padding: 4rem; }
       }
- 
+
       /* ─── Eyebrow ───────────────────────────────────────────────── */
       .eyebrow {
         font-family: var(--font-mono);
@@ -111,7 +111,7 @@
         line-height: 1;
         margin-bottom: 1.5rem;
       }
- 
+
       .h-light {
         display: block;
         font-family: var(--font-sans);
@@ -120,7 +120,7 @@
         letter-spacing: -0.02em;
         color: var(--parchment);
       }
- 
+
       .h-accent {
         display: block;
         font-size: clamp(3.5rem, 7vw, 5rem);
@@ -130,7 +130,7 @@
         color: transparent;
         line-height: 1;
       }
- 
+
       /* ─── Subheading ────────────────────────────────────────────── */
       .subhead {
         font-family: var(--font-mono);
@@ -140,7 +140,53 @@
         margin-bottom: 2.5rem;
         max-width: 20rem;
       }
- 
+
+      /* ─── Packages ──────────────────────────────────────────────── */
+      .packages {
+        display: flex;
+        align-items: flex-end;
+        gap: 1.75rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .pkg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        color: var(--muted);
+        transition: color 0.15s;
+      }
+
+      .pkg:hover { color: var(--parchment); }
+
+      .pkg-sym {
+        font-family: var(--font-mono);
+        font-size: 1.4rem;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        color: inherit;
+      }
+
+      .pkg.garamond .pkg-sym {
+        font-family: 'EB Garamond', serif;
+        font-style: italic;
+        font-size: 1.6rem;
+        letter-spacing: 0;
+      }
+
+      .pkg.small-sym .pkg-sym {
+        font-size: 1.1rem;
+      }
+
+      .pkg-name {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        color: inherit;
+      }
+
       /* ─── Button ────────────────────────────────────────────────── */
       .btn-ghost {
         display: inline-block;
@@ -154,7 +200,7 @@
         padding: 0.75rem 1.25rem;
         border-radius: 2px;
       }
- 
+
       .btn-ghost:hover, .btn-ghost:focus {
         background: #c8893a12;
         border-color: #ffb347;
@@ -167,7 +213,7 @@
     <div class="app">
 
       <header>
-        <img src="img/cdlogo-dark.png"  alt="cr0w digital" width="100" />
+        <img src="img/cdlogo-dark.png" alt="cr0w digital" width="100" />
       </header>
 
       <main>
@@ -186,7 +232,22 @@
               Open source tools<br />for the commons.
             </p>
 
-            <a href="https://github.com/cr0w-digital" class="btn-ghost" id="cta">View Packages →</a>
+            <div class="packages">
+              <a href="phml/index.html" class="pkg">
+                <span class="pkg-sym">&lt;/</span>
+                <span class="pkg-name">phml</span>
+              </a>
+              <a href="phorq/index.html" class="pkg">
+                <span class="pkg-sym">⎇</span>
+                <span class="pkg-name">phorq</span>
+              </a>
+              <a href="phrazor/index.html" class="pkg small-sym">
+                <span class="pkg-sym">//</span>
+                <span class="pkg-name">phrazor</span>
+              </a>
+            </div>
+
+            <a href="https://github.com/cr0w-digital" class="btn-ghost" id="cta">View Source →</a>
 
           </section>
         </div>

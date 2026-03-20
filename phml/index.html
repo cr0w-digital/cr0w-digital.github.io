@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></ phml | HTML builder for PHP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper:  #f0f2f5;
+    --ink:    #121418;
+    --accent: #1a5c8a;
+    --code:   #e6eaef;
+    --mid:    #3a4a5a;
+    --dim:    #7a8a9a;
+    --border: #cdd4dc;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 18px;
+  }
+
+  /* ── Ghost ───────────────────────────────────────────────────── */
+
+  .ghost {
+    position: fixed;
+    top: 50%;
+    right: -0.15em;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(260px, 36vw, 520px);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--accent);
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    letter-spacing: 0.02em;
+    animation: ghostIn 2.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  }
+
+  @keyframes ghostIn {
+    from { opacity: 0; }
+    to   { opacity: 0.06; }
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+  }
+
+  /* ── Nav ─────────────────────────────────────────────────────── */
+
+  nav {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65em;
+  }
+
+  .nav-symbol {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 1.05rem;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .nav-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+  }
+
+  .nav-right a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  .nav-right a:hover { color: var(--ink); }
+
+  /* ── Sections ────────────────────────────────────────────────── */
+
+  section {
+    padding: clamp(3.5rem, 7vw, 5.5rem) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.8rem;
+  }
+
+  h1, h2 {
+    font-family: 'EB Garamond', serif;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 7.5vw, 5rem);
+    margin-bottom: 1.8rem;
+    max-width: 720px;
+  }
+
+  h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin-bottom: 1.4rem;
+    max-width: 640px;
+  }
+
+  h1 em, h2 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--mid);
+    max-width: 600px;
+    margin-bottom: 1rem;
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── Install ─────────────────────────────────────────────────── */
+
+  .install {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.9rem 1.4rem;
+    margin-top: 2rem;
+  }
+
+  .install .prompt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .install .cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--ink);
+  }
+
+  /* ── Hero animations ─────────────────────────────────────────── */
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(0.8rem); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-section .section-label {
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  .hero-section h1 {
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .hero-section p {
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .hero-section .install {
+    animation: fadeUp 0.6s ease 0.48s both;
+  }
+
+  .section-usage {
+    animation: fadeUp 0.6s ease 0.55s both;
+  }
+
+  /* ── Code ────────────────────────────────────────────────────── */
+
+  pre {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1.4rem 1.6rem;
+    overflow-x: auto;
+    margin: 1.6rem 0;
+  }
+
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    line-height: 1.8;
+    color: var(--ink);
+    display: block;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.1em 0.35em;
+    color: var(--ink);
+  }
+
+  .tok-comment { color: var(--dim); font-style: italic; }
+  .tok-str     { color: var(--accent); }
+  .tok-kw      { color: var(--ink); font-weight: 500; }
+  .tok-fn      { color: var(--mid); }
+  .tok-dim     { color: var(--dim); }
+
+  /* ── Two col ─────────────────────────────────────────────────── */
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 1.6rem;
+  }
+
+  @media (max-width: 660px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  .col-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 0.6rem;
+  }
+
+  /* ── API table ───────────────────────────────────────────────── */
+
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.6rem;
+  }
+
+  .api-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: left;
+    padding: 0 1.2rem 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .api-table td {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+
+  .api-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .api-table tr:last-child td { border-bottom: none; }
+
+  /* ── Ecosystem ───────────────────────────────────────────────── */
+
+  .ecosystem {
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .eco-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+    align-items: flex-end;
+  }
+
+  .eco-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--dim);
+    transition: color 0.15s;
+  }
+
+  .eco-link:hover { color: var(--ink); }
+
+  .eco-link .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+
+  .eco-link.phi-sym .sym {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.6rem;
+  }
+
+  .eco-link.phrazor-sym .sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 1.1rem;
+  }
+
+  .eco-link .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+  }
+
+  .eco-link.current .sym { color: var(--accent); }
+  .eco-link.current      { color: var(--ink); }
+
+  /* ── Site footer ─────────────────────────────────────────────── */
+
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.6rem 0 2.4rem;
+  }
+
+  .site-footer-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--dim);
+  }
+
+  .site-footer-right {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .site-footer-right a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  .site-footer-right a:hover { color: var(--ink); }
+
+  @media (max-width: 480px) {
+    .page { padding: 0 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ghost" aria-hidden="true">&lt;/</div>
+
+<div class="page">
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-left">
+      <span class="nav-symbol" aria-hidden="true">&lt;/</span>
+      <span class="nav-name">phml</span>
+      <span class="nav-version">v0.1.0</span>
+    </div>
+    <div class="nav-right">
+      <a href="https://github.com/cr0w-digital/phml">GitHub ↗</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="section-label">Composable HTML builder for PHP</div>
+
+    <h1>PHP all the way.<br><em>Skip the template.</em></h1>
+
+    <p>
+      <code>h('.card', h('p', 'Hello'))</code> — no templates,
+      no compilation, no string interpolation. Nodes are plain PHP arrays.
+      Map them, filter them, pass them around. Render when you need a string.
+    </p>
+
+    <div class="install">
+      <span class="prompt">$</span>
+      <span class="cmd">composer require cr0w/phml</span>
+    </div>
+  </section>
+
+  <!-- Usage -->
+  <section class="section-usage">
+    <div class="section-label">Usage</div>
+    <h2>Build arrays.<br>Render HTML.</h2>
+
+    <div class="two-col">
+      <div>
+        <div class="col-label">Building nodes</div>
+<pre><code><span class="tok-comment">// Tag, optional attrs, children</span>
+<span class="tok-fn">h</span>(<span class="tok-str">'.card'</span>, <span class="tok-fn">h</span>(<span class="tok-str">'p'</span>, <span class="tok-str">'Hello'</span>));
+
+<span class="tok-comment">// CSS selector shorthand</span>
+<span class="tok-fn">h</span>(<span class="tok-str">'.card.featured#user'</span>, [
+    <span class="tok-str">'data-'</span>    => [<span class="tok-str">'userId'</span> => $id],
+    <span class="tok-str">'aria-'</span>    => [<span class="tok-str">'label'</span> => <span class="tok-str">'Card'</span>],
+    <span class="tok-str">'style'</span>    => [<span class="tok-str">'marginTop'</span> => <span class="tok-str">'1rem'</span>],
+]);
+
+<span class="tok-comment">// Void elements — self-closing</span>
+<span class="tok-fn">h</span>(<span class="tok-str">'input'</span>, [
+    <span class="tok-str">'type'</span>     => <span class="tok-str">'text'</span>,
+    <span class="tok-str">'required'</span> => <span class="tok-kw">true</span>,
+    <span class="tok-str">'disabled'</span> => <span class="tok-kw">false</span>, <span class="tok-comment">// omitted</span>
+]);</code></pre>
+      </div>
+      <div>
+        <div class="col-label">Rendering & escaping</div>
+<pre><code><span class="tok-comment">// Render node tree to string</span>
+<span class="tok-kw">echo</span> \phml\<span class="tok-fn">render</span>(
+    <span class="tok-fn">h</span>(<span class="tok-str">'ul'</span>,
+        <span class="tok-fn">array_map</span>(
+            fn($item) => <span class="tok-fn">h</span>(<span class="tok-str">'li'</span>, $item),
+            $items
+        )
+    )
+);
+
+<span class="tok-comment">// e() escapes for safe output</span>
+<span class="tok-fn">e</span>(<span class="tok-str">'&lt;script&gt;'</span>); <span class="tok-comment">// &amp;lt;script&amp;gt;</span>
+
+<span class="tok-comment">// raw() bypasses escaping</span>
+<span class="tok-fn">h</span>(<span class="tok-str">'div'</span>, <span class="tok-fn">raw</span>($trustedHtml));</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Class composition -->
+  <section>
+    <div class="section-label">Class composition</div>
+    <h2>Conditional classes<br>without <em>string juggling.</em></h2>
+
+    <p>
+      <code>c()</code> accepts strings, booleans, associative arrays,
+      and nested arrays in any combination. Falsy values are silently
+      dropped. The result is a clean space-separated class string.
+    </p>
+
+<pre><code><span class="tok-comment">// Strings — always included</span>
+<span class="tok-fn">c</span>(<span class="tok-str">'btn'</span>, <span class="tok-str">'btn-lg'</span>);
+<span class="tok-comment">// → 'btn btn-lg'</span>
+
+<span class="tok-comment">// Conditional — include when truthy</span>
+<span class="tok-fn">c</span>(<span class="tok-str">'btn'</span>, $active && <span class="tok-str">'is-active'</span>, $disabled && <span class="tok-str">'is-disabled'</span>);
+<span class="tok-comment">// → 'btn is-active'  (when $active, !$disabled)</span>
+
+<span class="tok-comment">// Associative — class => condition</span>
+<span class="tok-fn">c</span>(<span class="tok-str">'btn'</span>, [
+    <span class="tok-str">'btn-primary'</span> => $primary,
+    <span class="tok-str">'btn-block'</span>   => $block,
+]);
+<span class="tok-comment">// → 'btn btn-primary'  (when $primary, !$block)</span>
+
+<span class="tok-comment">// Nested arrays — flattened</span>
+<span class="tok-fn">c</span>([<span class="tok-str">'px-4'</span>, [<span class="tok-str">'py-2'</span>, [<span class="tok-str">'rounded'</span> => <span class="tok-kw">true</span>]]]);
+<span class="tok-comment">// → 'px-4 py-2 rounded'</span></code></pre>
+
+    <p>
+      <code>c()</code> is also used internally by <code>h()</code> —
+      passing a <code>class</code> attribute accepts the same mixed
+      inputs directly.
+    </p>
+  </section>
+
+  <!-- How nodes work -->
+  <section>
+    <div class="section-label">Node format</div>
+    <h2>Nodes are arrays.<br><em>Compose freely.</em></h2>
+
+    <p>
+      A node is a plain PHP array: <code>[$tag, $attrs, ...$children]</code>.
+      Because they are data, they can be passed around, filtered, mapped,
+      and merged before rendering. No objects, no builder chains, no state.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="col-label">Composing nodes</div>
+<pre><code>$badge = <span class="tok-fn">h</span>(<span class="tok-str">'span.badge'</span>, $count);
+
+$card = <span class="tok-fn">h</span>(<span class="tok-str">'.card'</span>,
+    <span class="tok-fn">h</span>(<span class="tok-str">'h2'</span>, $title),
+    <span class="tok-fn">h</span>(<span class="tok-str">'p'</span>, $body),
+    $showBadge ? $badge : <span class="tok-kw">null</span>,
+);
+
+<span class="tok-comment">// null and false children are silently dropped</span>
+<span class="tok-kw">echo</span> \phml\<span class="tok-fn">render</span>($card);</code></pre>
+      </div>
+      <div>
+        <div class="col-label">Fragments & lists</div>
+<pre><code><span class="tok-comment">// A flat array of nodes renders as a fragment</span>
+$items = <span class="tok-fn">array_map</span>(
+    fn($row) => <span class="tok-fn">h</span>(<span class="tok-str">'tr'</span>,
+        <span class="tok-fn">h</span>(<span class="tok-str">'td'</span>, $row[<span class="tok-str">'name'</span>]),
+        <span class="tok-fn">h</span>(<span class="tok-str">'td'</span>, $row[<span class="tok-str">'value'</span>]),
+    ),
+    $rows
+);
+
+<span class="tok-kw">echo</span> \phml\<span class="tok-fn">render</span>(
+    <span class="tok-fn">h</span>(<span class="tok-str">'table'</span>, $items)
+);</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- API reference -->
+  <section>
+    <div class="section-label">API</div>
+    <h2>Public surface.</h2>
+
+    <table class="api-table">
+      <thead>
+        <tr>
+          <th>Function</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>h($selector, ...$args)</td>
+          <td>Build a node. Selector supports tag, <code>#id</code>, and <code>.class</code> shorthand. Optional associative array of attributes, followed by any number of children.</td>
+        </tr>
+        <tr>
+          <td>e($value)</td>
+          <td>Escape a value for HTML output via <code>htmlspecialchars</code>. Called automatically on all string children in <code>render()</code>.</td>
+        </tr>
+        <tr>
+          <td>c(...$parts)</td>
+          <td>Compose a class string from mixed inputs — strings, conditionals, associative arrays, nested arrays.</td>
+        </tr>
+        <tr>
+          <td>raw($html)</td>
+          <td>Wrap a string as trusted HTML. Bypasses escaping in <code>render()</code>. Use only with content you control.</td>
+        </tr>
+        <tr>
+          <td>\phml\render($node)</td>
+          <td>Render a node or tree to an HTML string.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Ecosystem -->
+  <section class="ecosystem">
+    <div class="section-label">Ecosystem</div>
+    <div class="eco-links">
+      <a href="#" class="eco-link current">
+        <span class="sym">&lt;/</span>
+        <span class="name">phml</span>
+      </a>
+      <a href="../phorq/index.html" class="eco-link">
+        <span class="sym">⎇</span>
+        <span class="name">phorq</span>
+      </a>
+      <a href="../phrazor/index.html" class="eco-link phrazor-sym">
+        <span class="sym">//</span>
+        <span class="name">phrazor</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Site footer -->
+  <div class="site-footer">
+    <div class="site-footer-left"><span style="letter-spacing:0.02em">&lt;/</span> phml &mdash; MIT</div>
+    <div class="site-footer-right">
+      <a href="https://github.com/cr0w-digital/phml">GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
