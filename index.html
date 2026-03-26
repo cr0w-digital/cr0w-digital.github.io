@@ -15,8 +15,9 @@
       html { box-sizing: border-box; }
       *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
 
-      /* ─── Tokens ────────────────────────────────────────────────── */
+      /* ─── Tokens (original palette + mapped usages) ─────────────── */
       :root {
+        /* base palette (unchanged) */
         --void:      #080808;
         --surface:   #111110;
         --raised:    #1a1916;
@@ -25,6 +26,13 @@
         --parchment: #d8d4c4;
         --muted:     #8a7a5a;
         --faint:     #3a3530;
+
+        /* mapped / previously hardcoded */
+        --text-body:        #d1cdc0;
+        --pkg-color:        #e6dcc6;
+        --pkg-hover:        #ffffff;
+        --cta-hover-bg:     #c8893a12;
+        --cta-border-hover: #ffb347;
 
         --font-sans:    'Geist', 'Inter', sans-serif;
         --font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
@@ -38,7 +46,7 @@
         background-image: url("img/bgrange-dark.jpg");
         background-size: cover;
         background-repeat: no-repeat;
-        color: #d1cdc0;
+        color: var(--text-body);
         font-family: var(--font-sans);
       }
 
@@ -155,14 +163,15 @@
         align-items: center;
         gap: 0.45rem;
         text-decoration: none;
-        color: var(--muted);
+        color: var(--pkg-color);
         transition: color 0.15s;
       }
 
-      .pkg:hover { color: var(--parchment); }
+      .pkg:hover { color: var(--pkg-hover); }
 
       .pkg-sym {
         font-family: var(--font-mono);
+        font-kerning: none;
         font-size: 1.4rem;
         line-height: 1;
         letter-spacing: 0.02em;
@@ -182,7 +191,7 @@
 
       .pkg-name {
         font-family: var(--font-mono);
-        font-size: 0.65rem;
+        font-size: 0.7rem;
         letter-spacing: 0.06em;
         color: inherit;
       }
@@ -202,8 +211,8 @@
       }
 
       .btn-ghost:hover, .btn-ghost:focus {
-        background: #c8893a12;
-        border-color: #ffb347;
+        background: var(--cta-hover-bg);
+        border-color: var(--cta-border-hover);
         outline: none;
       }
     </style>
@@ -247,7 +256,9 @@
               </a>
             </div>
 
-            <a href="https://github.com/cr0w-digital" class="btn-ghost" id="cta">View Source →</a>
+            <a href="https://github.com/cr0w-digital" class="btn-ghost" id="cta">
+              View Source →
+            </a>
 
           </section>
         </div>
