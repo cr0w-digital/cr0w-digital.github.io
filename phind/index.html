@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: only light;
+    --paper:       #f2f4f6;
+    --ink:         #141820;
+    --ink-dim:     #4a5262;
+    --ink-faint:   #6b7585;
+    --accent:      #2d6be4;
+    --code:        #e2e5ea;
+    --rule:        #c8cdd6;
+    --glow:        #1a8c42;
+    --glow-bg:     #eaf5ee;
+    --glow-border: #7dc49a;
+    --blue-bg:     #eaf0fc;
+    --blue-border: #8ab0e8;
+    --blue-text:   #1a4fa0;
+    --red-bg:      #faeaea;
+    --red-border:  #d49090;
+    --red-text:    #9b2c20;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 18px; background: var(--paper); color: var(--ink); }
+  body { font-family: 'EB Garamond', Georgia, serif; line-height: 1.6; overflow-x: hidden; color: var(--ink); background: var(--paper); }
+
+  .ghost {
+    position: fixed;
+    top: -25%;
+    right: -0.05em;
+    font-family: 'EB Garamond', serif;
+    font-size: 80vw;
+    line-height: 1;
+    color: #141820;
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 0;
+    user-select: none;
+    animation: ghostIn 2s ease both;
+  }
+  @keyframes ghostIn { from { opacity: 0; } to { opacity: 0.028; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(0.8rem); } to { opacity: 1; transform: translateY(0); } }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 0 2.5rem; position: relative; z-index: 1; }
+
+  nav { display: flex; align-items: baseline; justify-content: space-between; padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--rule); }
+  .nav-logo { display: flex; align-items: baseline; gap: 0.5rem; }
+  .nav-symbol   { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--glow); }
+  .nav-wordmark { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500; color: var(--ink); letter-spacing: 0.02em; }
+  .nav-version  { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-faint); letter-spacing: 0.05em; }
+  .nav-links { display: flex; align-items: baseline; gap: 2.5rem; list-style: none; }
+  .nav-links a { font-family: 'JetBrains Mono', monospace; font-size: 0.67rem; letter-spacing: 0.06em; color: var(--ink-dim); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--ink); }
+
+  .hero { padding: 8rem 0 6rem; }
+  .hero-label { font-family: 'JetBrains Mono', monospace; font-size: 0.67rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--glow); margin-bottom: 2.5rem; display: block; animation: fadeUp 0.5s ease 0.1s both; }
+  h1 { font-family: 'EB Garamond', serif; font-size: clamp(3.2rem, 7vw, 5.2rem); font-weight: 400; line-height: 1.08; letter-spacing: -0.01em; margin-bottom: 2rem; max-width: 16ch; color: var(--ink); animation: fadeUp 0.6s ease 0.2s both; }
+  h1 em { font-style: italic; color: var(--ink-dim); }
+  .hero-body { font-size: 1.05rem; line-height: 1.75; color: var(--ink-dim); max-width: 52ch; margin-bottom: 3rem; animation: fadeUp 0.6s ease 0.35s both; }
+  .hero-install { display: inline-flex; align-items: center; gap: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 300; color: var(--ink); background: var(--code); border: 1px solid var(--rule); padding: 0.85rem 1.4rem; cursor: pointer; transition: border-color 0.15s; animation: fadeUp 0.6s ease 0.48s both; }
+  .hero-install:hover { border-color: var(--glow); }
+  .hero-install .prompt { color: var(--glow); }
+  .copy-hint { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--ink-faint); letter-spacing: 0.06em; text-transform: uppercase; margin-left: 0.5rem; cursor: pointer; background: none; border: none; transition: color 0.15s; }
+  .copy-hint:hover { color: var(--glow); }
+
+  section { border-top: 1px solid var(--rule); padding: 5rem 0; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3rem; display: block; }
+  h2 { font-family: 'EB Garamond', serif; font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 1.5rem; color: var(--ink); }
+  h2 em { font-style: italic; color: var(--ink-dim); }
+  .lead { font-size: 1rem; line-height: 1.8; color: var(--ink-dim); max-width: 52ch; margin-bottom: 2rem; }
+
+  .split { display: grid; grid-template-columns: 1fr 1.1fr; gap: 4rem; align-items: start; }
+
+  .records-demo { display: flex; flex-direction: column; background: var(--code); border: 1px solid var(--rule); }
+  .record-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; padding: 0.8rem 1.2rem; border-bottom: 1px solid var(--rule); gap: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--ink); transition: background 0.1s; }
+  .record-row:last-child { border-bottom: none; }
+  .record-row:hover { background: var(--rule); }
+  .wild { color: var(--glow); }
+  .record-type { font-size: 0.58rem; background: var(--glow-bg); border: 1px solid var(--glow-border); color: var(--glow); padding: 1px 7px; letter-spacing: 0.04em; }
+  .record-val { color: var(--ink-faint); text-align: right; }
+
+  .transport-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .pill { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; padding: 3px 10px; letter-spacing: 0.05em; }
+  .pill-udp { background: var(--glow-bg); border: 1px solid var(--glow-border); color: var(--glow); }
+  .pill-tcp { background: var(--blue-bg); border: 1px solid var(--blue-border); color: var(--blue-text); }
+
+  .chain-label { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.5rem; display: block; }
+  .resolve-chain { display: flex; align-items: center; gap: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .rnode { background: var(--code); border: 1px solid var(--rule); padding: 0.35rem 0.7rem; color: var(--ink); }
+  .rnode.local { border-color: var(--glow-border); background: var(--glow-bg); color: var(--glow); }
+  .rarrow { color: var(--rule); font-size: 1rem; }
+  .chain-note { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--ink-faint); line-height: 1.7; margin-bottom: 1.5rem; }
+  .chain-note code { color: var(--ink-dim); }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--rule); }
+  .tab { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--ink-faint); padding: 0.75rem 1.4rem; cursor: pointer; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: var(--paper); transition: color 0.15s; user-select: none; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover:not(.active) { color: var(--ink-dim); }
+  .tab-panel { display: none; background: var(--code); border: 1px solid var(--rule); border-top: none; padding: 1.75rem 2rem; }
+  .tab-panel.active { display: block; }
+  .tab-note { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--ink-faint); margin-top: 1rem; line-height: 1.7; padding-left: 1rem; border-left: 2px solid var(--rule); }
+
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 300; line-height: 1.9; color: var(--ink-dim); overflow-x: auto; margin: 0; background: var(--code); border: 1px solid var(--rule); padding: 1.5rem 1.75rem; }
+  .tab-panel pre { background: none; border: none; padding: 0; }
+  .split pre { background: none; border: none; padding: 0; }
+  .c-prompt  { color: var(--glow); }
+  .c-comment { color: var(--ink-faint); font-style: italic; }
+  .c-key     { color: var(--blue-text); }
+  .c-num     { color: #6d28d9; }
+
+  .api-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; }
+  .api-table th { text-align: left; color: var(--ink-faint); font-weight: 400; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 1rem 0.75rem 0; border-bottom: 1px solid var(--rule); }
+  .api-table td { padding: 0.65rem 1rem 0.65rem 0; border-bottom: 1px solid var(--rule); vertical-align: middle; color: var(--ink); }
+  .api-table tr:last-child td { border-bottom: none; }
+  .method { font-size: 0.58rem; font-weight: 500; padding: 2px 7px; letter-spacing: 0.04em; display: inline-block; }
+  .m-get  { background: var(--glow-bg);  color: var(--glow);      border: 1px solid var(--glow-border); }
+  .m-post { background: var(--blue-bg);  color: var(--blue-text); border: 1px solid var(--blue-border); }
+  .m-del  { background: var(--red-bg);   color: var(--red-text);  border: 1px solid var(--red-border); }
+  .api-path { color: var(--ink); }
+  .api-desc { color: var(--ink-faint); font-size: 0.65rem; }
+
+  .event-dot { display: inline-block; width: 6px; height: 6px; background: var(--glow); border-radius: 50%; margin-right: 0.5rem; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .event-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-faint); margin-bottom: 0.75rem; letter-spacing: 0.06em; }
+
+  .snote { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--ink-faint); margin-top: 1.25rem; line-height: 1.7; padding-left: 1rem; border-left: 2px solid var(--rule); }
+
+  .ecosystem { padding: clamp(3rem, 6vw, 5rem) 0; border-bottom: 1px solid var(--rule); }
+  .eco-links { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 0.5rem; align-items: flex-end; }
+  .eco-link { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--ink-faint); transition: color 0.15s; }
+  .eco-link:hover { color: var(--ink); }
+  .eco-link .sym { font-family: 'JetBrains Mono', monospace; font-size: 1.4rem; line-height: 1; color: var(--ink-faint); letter-spacing: 0.02em; }
+  .eco-link .name { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.02em; color: inherit; }
+  .eco-link.current .sym { color: var(--glow); }
+  .eco-link.current { color: var(--ink); }
+  .eco-link.phrazor-sym .sym { font-size: 1.1rem; }
+
+  footer { border-top: 1px solid var(--rule); padding: 2rem 0; display: flex; justify-content: space-between; align-items: baseline; }
+  footer p { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; font-weight: 300; letter-spacing: 0.06em; color: var(--ink-faint); }
+  .footer-links { display: flex; gap: 2rem; list-style: none; }
+  .footer-links a { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-faint); text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--ink-dim); }
+
+  @media (max-width: 640px) {
+    .split { grid-template-columns: 1fr; gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ghost">↯</div>
+
+<div class="page">
+
+  <nav>
+    <div class="nav-logo">
+      <span class="nav-symbol">↯</span>
+      <span class="nav-wordmark">phind</span>
+      <span class="nav-version">v0.1.0</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="https://github.com/cr0w-digital/phind">GitHub ↗</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <span class="hero-label">local-first service resolution</span>
+    <h1>Local DNS,<br><em>simplified.</em></h1>
+    <p class="hero-body">Records, wildcards, runtime management, upstream fallback.</p>
+    <div class="hero-install" onclick="navigator.clipboard.writeText('composer global require cr0w/phind').then(()=>{const h=this.querySelector('.copy-hint');h.textContent='copied';setTimeout(()=>h.textContent='copy',1500)})">
+      <span class="prompt">$</span>
+      <span>composer global require cr0w/phind</span>
+      <button class="copy-hint">copy</button>
+    </div>
+  </div>
+
+  <section>
+    <span class="section-label">Records</span>
+    <div class="split">
+      <div>
+        <h2>Define once.<br><em>Resolve anywhere.</em></h2>
+        <p class="lead">Records live at <code style="font-family:'JetBrains Mono',monospace;font-size:0.85em;color:var(--ink-dim)">~/.phind/records.json</code>. Wildcards, multiple domains, cross-host targets — all part of the same naming layer.</p>
+        <pre>export PHIND_STORAGE_PATH=/your/path</pre>
+        <p class="snote">phind requires a restart to pick up direct file changes. Use the HTTP API to manage records at runtime — cache clears automatically.</p>
+      </div>
+      <div>
+        <div class="records-demo">
+          <div class="record-row"><span><span class="wild">*</span>.phind</span><span class="record-val">127.0.0.1</span><span class="record-type">A</span></div>
+          <div class="record-row"><span><span class="wild">*</span>.dev</span><span class="record-val">127.0.0.1</span><span class="record-type">A</span></div>
+          <div class="record-row"><span>api.local</span><span class="record-val">127.0.0.1</span><span class="record-type">A</span></div>
+          <div class="record-row"><span>db.test</span><span class="record-val">192.168.1.50</span><span class="record-type">A</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-label">Resolution</span>
+    <h2>Resolves <em>A</em>, <em>AAAA</em>, and <em>CNAME</em> locally.</h2>
+    <p class="lead">Unknown names fall through to upstream DNS. Results are cached in memory. Both transports on port 8053.</p>
+    <div class="transport-row">
+      <span class="pill pill-udp">UDP</span>
+      <span class="pill pill-tcp">TCP</span>
+    </div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--ink-dim);margin-bottom:1.5rem;line-height:1.8">TCP handles automatic client fallback when UDP responses are truncated — important for DNSSEC, large TXT records, and SPF chains if routing real network traffic through phind.</p>
+    <span class="chain-label">CNAME chain example</span>
+    <div class="resolve-chain">
+      <div class="rnode">api.phind</div>
+      <span class="rarrow">→</span>
+      <div class="rnode">auth.phind</div>
+      <span class="rarrow">→</span>
+      <div class="rnode local">127.0.0.1</div>
+    </div>
+    <p class="chain-note"><code>api.phind</code> is a CNAME pointing to <code>auth.phind</code>, which has an A record. phind follows the chain and returns the final address.</p>
+    <pre><span class="c-prompt">$</span> dig @127.0.0.1 -p 8053 api.dev</pre>
+  </section>
+
+  <section>
+    <span class="section-label">System-wide resolution</span>
+    <h2>Make it work<br><em>everywhere.</em></h2>
+    <p class="lead">phind listens on port 8053 and won't affect normal DNS until you point something at it.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="router">Router DNS</button>
+      <button class="tab" data-tab="dnsmasq">dnsmasq</button>
+      <button class="tab" data-tab="explicit">Explicit queries</button>
+    </div>
+    <div class="tab-panel active" id="panel-router">
+      <pre><span class="c-comment"># Point your router's DNS at the machine running phind.
+# All devices on the network get local domain resolution,
+# everything else falls through upstream as usual.</span>
+
+DNS Server: 192.168.1.x</pre>
+      <p class="tab-note">If the machine running phind goes down, your network loses DNS until it comes back.</p>
+    </div>
+    <div class="tab-panel" id="panel-dnsmasq">
+      <pre><span class="c-comment"># /etc/dnsmasq.conf</span>
+server=/.phind/127.0.0.1#8053
+server=/.dev/127.0.0.1#8053</pre>
+      <p class="tab-note">Forwards only your dev domains to phind. Everything else is unaffected.</p>
+    </div>
+    <div class="tab-panel" id="panel-explicit">
+      <pre><span class="c-prompt">$</span> dig @127.0.0.1 -p 8053 app.phind</pre>
+      <p class="tab-note">No config needed. .phind domains won't work in your browser without one of the other options.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-label">HTTP API</span>
+    <div class="split">
+      <div>
+        <h2>Runtime<br><em>management.</em></h2>
+        <p class="lead">A separate service for managing records, querying resolution, and streaming live metrics.</p>
+        <pre><span class="c-prompt">$</span> bin/phind-http
+<span class="c-comment">http://127.0.0.1:8080</span></pre>
+      </div>
+      <div>
+        <table class="api-table">
+          <thead><tr><th>method</th><th>endpoint</th><th>description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method m-get">GET</span></td><td class="api-path">/records</td><td class="api-desc">list all</td></tr>
+            <tr><td><span class="method m-post">POST</span></td><td class="api-path">/records</td><td class="api-desc">add or update</td></tr>
+            <tr><td><span class="method m-del">DELETE</span></td><td class="api-path">/records/{hostname}</td><td class="api-desc">remove</td></tr>
+            <tr><td><span class="method m-get">GET</span></td><td class="api-path">/resolve</td><td class="api-desc">resolve a name</td></tr>
+            <tr><td><span class="method m-get">GET</span></td><td class="api-path">/metrics</td><td class="api-desc">snapshot</td></tr>
+            <tr><td><span class="method m-get">GET</span></td><td class="api-path">/events</td><td class="api-desc">SSE stream</td></tr>
+            <tr><td><span class="method m-get">GET</span></td><td class="api-path">/status</td><td class="api-desc">server status</td></tr>
+            <tr><td><span class="method m-post">POST</span></td><td class="api-path">/cache/clear</td><td class="api-desc">flush cache</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="section-label">Observability</span>
+    <div class="split">
+      <div>
+        <h2>Metrics and<br><em>live events.</em></h2>
+        <p class="lead">Tracks cache hits/misses, latency, local vs. upstream resolution, upstream forwards, and failures. Metrics stay in memory — writes are never in the lookup path.</p>
+        <pre><span class="c-prompt">$</span> curl -N http://127.0.0.1:8080/events
+
+export PHIND_OTLP_ENDPOINT=\
+  http://localhost:4318/phind/events</pre>
+      </div>
+      <div>
+        <p class="event-label"><span class="event-dot"></span>event: metrics · 1s interval</p>
+        <pre><span style="color:var(--ink-dim)">{
+  <span class="c-key">"queries_today"</span>: <span class="c-num">142</span>,
+  <span class="c-key">"cache_hits"</span>: <span class="c-num">118</span>,
+  <span class="c-key">"cache_misses"</span>: <span class="c-num">24</span>,
+  <span class="c-key">"cache_hit_rate"</span>: <span class="c-num">0.83</span>,
+  <span class="c-key">"upstream_forwards"</span>: <span class="c-num">19</span>,
+  <span class="c-key">"resolution_failures"</span>: <span class="c-num">0</span>,
+  <span class="c-key">"recent_queries"</span>: [...],
+  <span class="c-key">"logs"</span>: [...]
+}</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <div class="ecosystem">
+    <span class="section-label">Ecosystem</span>
+    <div class="eco-links">
+      <a href="#" class="eco-link current">
+        <span class="sym">↯</span>
+        <span class="name">phind</span>
+      </a>
+      <a href="../phml/" class="eco-link">
+        <span class="sym">&lt;/</span>
+        <span class="name">phml</span>
+      </a>
+      <a href="../phorq/" class="eco-link">
+        <span class="sym">⎇</span>
+        <span class="name">phorq</span>
+      </a>
+      <a href="../phrazor/" class="eco-link phrazor-sym">
+        <span class="sym">//</span>
+        <span class="name">phrazor</span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p>↯ phind — MIT</p>
+    <ul class="footer-links">
+      <li><a href="https://github.com/cr0w-digital/phind">GitHub</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
